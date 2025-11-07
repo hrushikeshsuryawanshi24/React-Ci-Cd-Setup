@@ -9,6 +9,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
           node-version: '21'
+
+      - name: Clone the repository
+        uses: actions/checkout@v3    
+
+      - name: Install dependencies
+        run: npm install
+        
+      - name: list dependencies
+        run: ls
