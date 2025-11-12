@@ -4,6 +4,7 @@ on:
     branches:
       - main
       - master
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -13,11 +14,11 @@ jobs:
         with:
           node-version: '21'
 
-      - name: check node version
-        run: node -v
-
       - name: Clone the repository
         uses: actions/checkout@v3
+
+      - name: check node version
+        run: node -v
 
       - name: Install dependencies
         run: npm install
@@ -31,8 +32,26 @@ jobs:
       - name: Run lint
         run: npm run lint
 
+      - name: Show repo and test files (debug)
+        run: |
+          echo "Working dir: $(pwd)"
+          echo "Top-level files:"
+          ls -la
+          echo "Recursive listing (top 4 levels):"
+          ls -R | sed -n '1,200p'
+          echo "Find any *test* files:"
+          find . -maxdepth 5 -type f -name "*.test.*" -print || true
+          echo "If test/sample.test.js exists, show its content:"
+          if [ -f test/sample.test.js ]; then
+            echo "---- sample.test.js ----"
+            sed -n '1,200p' test/sample.test.js
+            echo "---- end file ----"
+          else
+            echo "test/sample.test.js not found"
+          fi
+
       - name: Run tests (non-blocking)
-        run: npm run test --if-present || echo "Tests not present or failed — continuing (non-blocking)"
+        run: npm run test --if-present || true
 
       - name: Build the project
         run: npm run build
