@@ -6,28 +6,29 @@ on:
     types:
       - completed
 
-jobs:  
-  deploy:    
-      runs-on: ubuntu-latest
-      environment: production
+permissions:
+  actions: read
+  contents: read
 
-      steps:
-        - name: "Set up Node.js"
-          uses: actions/setup-node@v4
-          with:
-            node-version: '21'
-          
-        - name: "Setup versel CLI"
-          run: npm install -g vercel
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: "Set up Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: '21'
 
-        - name: "Download build artifacts"
-          uses: actions/download-artifact@v4
-          with:
-            name: build
-            run-id: ${{ github.event.workflow_run.id }}
-            github-token: ${{ github.token }}
+      - name: "Setup vercel CLI"
+        run: npm install -g vercel
 
-        - name: "Deploy to Vercel"
-          run : vercel --prod --token= $VERCEL_TOKEN=${{ secrets.VERCEL_TOKEN }} --confirm --name=cicdproduction
-          
-               
+      - name: "Download build artifacts"
+        uses: actions/download-artifact@v4
+        with:
+          name: production-files            # <-- match the artifact name produced by CI
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      - name: "Deploy to Vercel"
+        run: vercel --prod --token "${{ secrets.VERCEL_TOKEN }}" --confirm --name cicdproduction
